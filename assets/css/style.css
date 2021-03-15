@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.brick {
+  border-color: #575652;
+  background-image: url("../images/brick.png");
+  @apply text-white;
+  @apply border-4;
+  @apply border-t-0;
+}
