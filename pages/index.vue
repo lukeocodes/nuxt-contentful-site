@@ -20,6 +20,7 @@ export default {
       }),
     ])
       .then(([entries]) => {
+        console.log(entries);
         return {
           person: entries.items[0],
         };
