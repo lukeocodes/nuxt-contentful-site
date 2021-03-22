@@ -13,19 +13,12 @@ import { createClient } from "~/plugins/contentful.js";
 const client = createClient();
 
 export default {
-  asyncData({ env }) {
-    return Promise.all([
-      client.getEntries({
-        "sys.id": env.CONTENTFUL_PERSON,
-      }),
-    ])
-      .then(([entries]) => {
-        console.log(entries);
-        return {
-          person: entries.items[0],
-        };
-      })
-      .catch(console.error);
+  async asyncData({ env }) {
+    const person = await client.getEntry(env.CONTENTFUL_PERSON);
+
+    return {
+      person,
+    };
   },
 };
 </script>

@@ -1,42 +1,41 @@
 <template>
-  <div>
-    <h1>{{ person.fields.name }}</h1>
-    <ul>
-      <li v-for="(post, index) in posts" :key="index">
-        {{ post.fields.title }}
-      </li>
-    </ul>
-  </div>
+  <article v-if="post" class="prose prose-lg xl:prose-xl max-w-none">
+    <ContentfulAuthor :author="post.fields.author" />
+    <h1>{{ post.fields.title }}</h1>
+    <blockquote class="p-8 text-lg bg-blue-100 border-l-4 border-blue-600">
+      {{ post.fields.description }}
+    </blockquote>
+    <vue-markdown>{{ post.fields.body }}</vue-markdown>
+  </article>
 </template>
 
 <script>
+import VueMarkdown from "vue-markdown";
 import { createClient } from "~/plugins/contentful.js";
 
 const client = createClient();
 
 export default {
-  // `env` is available in the context object
-  asyncData({ env }) {
-    return Promise.all([
-      // fetch the owner of the blog
-      client.getEntries({
-        "sys.id": env.CONTENTFUL_PERSON,
-      }),
-      // fetch all blog posts sorted by creation date
-      client.getEntries({
-        content_type: env.CONTENTFUL_POST_TYPE,
-        order: "-sys.createdAt",
-      }),
-    ])
-      .then(([entries, posts]) => {
-        // return data that should be available
-        // in the template
-        return {
-          person: entries.items[0],
-          posts: posts.items,
-        };
-      })
-      .catch(console.error);
+  components: {
+    VueMarkdown,
+  },
+
+  async asyncData({ params: { slug } }) {
+    const posts = await client.getEntries({
+      content_type: "blogPost",
+      "fields.slug[in]": slug,
+      limit: 1,
+    });
+
+    return {
+      post: posts.items[0],
+    };
+  },
+
+  data() {
+    return {
+      post: null,
+    };
   },
 };
 </script>
